@@ -68,11 +68,7 @@ object TransferTransactionDiff {
         GenericError(s"Unissued assets are not allowed after allowUnissuedAssetsUntil=${s.allowUnissuedAssetsUntil}")
       )
     } yield
-      Diff(height,
-           tx,
-           portfolios,
-           scriptsRun = DiffsCommon.countScriptRuns(blockchain, tx),
-           scriptsComplexity = DiffsCommon.countScriptsComplexity(blockchain, tx))
+      Diff(height, tx, portfolios, scriptsRun = DiffsCommon.countScriptRuns(blockchain, tx), scriptsComplexity = DiffsCommon.countScriptsComplexity(blockchain, tx))
   }
 
   private def validateOverflow(blockchain: Blockchain, tx: TransferTransaction) = {

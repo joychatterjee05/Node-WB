@@ -244,12 +244,10 @@ object InvokeScriptTransactionDiff {
 
       if (totalDataBytes <= ContractLimits.MaxWriteSetSizeInBytes) {
         Right(
-          Diff(
-            height = height,
+          Diff(height = height,
             tx = tx,
             portfolios = feePart combine payablePart,
-            accountData = Map(dAppAddress -> AccountDataInfo(dataEntries.map(d => d.key -> d).toMap))
-          )
+            accountData = Map(dAppAddress -> AccountDataInfo(dataEntries.map(d => d.key -> d).toMap)))
         )
       } else
         Left(GenericError(s"WriteSet size can't exceed ${ContractLimits.MaxWriteSetSizeInBytes} bytes, actual: $totalDataBytes bytes"))

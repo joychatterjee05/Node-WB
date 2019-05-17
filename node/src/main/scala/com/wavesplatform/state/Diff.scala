@@ -135,8 +135,8 @@ case class Diff(transactions: Map[ByteStr, (Int, Transaction, Set[Address])],
                 accountData: Map[Address, AccountDataInfo],
                 sponsorship: Map[IssuedAsset, Sponsorship],
                 scriptsRun: Int,
-                scriptResults: Map[ByteStr, InvokeScriptResult],
-                scriptsComplexity: Long)
+                scriptsComplexity: Long,
+                scriptResults: Map[ByteStr, InvokeScriptResult])
 
 object Diff {
   def stateOps(portfolios: Map[Address, Portfolio] = Map.empty,
@@ -177,8 +177,8 @@ object Diff {
             accountData: Map[Address, AccountDataInfo] = Map.empty,
             sponsorship: Map[IssuedAsset, Sponsorship] = Map.empty,
             scriptsRun: Int = 0,
-            scriptResults: Map[ByteStr, InvokeScriptResult] = Map.empty,
-            scriptsComplexity: Long = 0): Diff =
+            scriptsComplexity: Long = 0,
+            scriptResults: Map[ByteStr, InvokeScriptResult] = Map.empty) =
     Diff(
       transactions = Map((tx.id(), (height, tx, (portfolios.keys ++ accountData.keys).toSet))),
       portfolios = portfolios,
@@ -195,7 +195,7 @@ object Diff {
       scriptsComplexity = scriptsComplexity
     )
 
-  val empty = new Diff(Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, 0, Map.empty, 0)
+  val empty = new Diff(Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, Map.empty, 0, 0, Map.empty)
 
   implicit val diffMonoid = new Monoid[Diff] {
     override def empty: Diff = Diff.empty

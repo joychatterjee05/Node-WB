@@ -110,17 +110,10 @@ object ExchangeTransactionDiff {
       val amountDiff = getAssetDiff(t.buyOrder.assetPair.amountAsset, buyAmountAssetChange, sellAmountAssetChange)
       val portfolios = Monoid.combineAll(Seq(feeDiff, priceDiff, amountDiff))
 
-      Diff(
-        height,
-        tx,
-        portfolios = portfolios,
-        orderFills = Map(
+      Diff(height, tx, portfolios = portfolios, orderFills = Map(
           tx.buyOrder.id()  -> VolumeAndFee(tx.amount, tx.buyMatcherFee),
           tx.sellOrder.id() -> VolumeAndFee(tx.amount, tx.sellMatcherFee)
-        ),
-        scriptsRun = scripts,
-        scriptsComplexity = scriptsComplexity
-      )
+      ), scriptsRun = scripts, scriptsComplexity = scriptsComplexity)
     }
   }
 

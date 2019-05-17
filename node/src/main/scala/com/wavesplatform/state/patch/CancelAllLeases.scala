@@ -14,6 +14,6 @@ object CancelAllLeases extends ScorexLogging {
     portfolios.keys.foreach(addr => log.info(s"Resetting lease balance for $addr"))
     log.info("Finished collecting all active leases")
 
-    Diff.empty.copy(portfolios = portfolios, leaseState = leasesToCancel, scriptsComplexity = scriptsComplexity)
+    Diff.empty.copy(portfolios = portfolios, leaseState = leasesToCancel)
   }
 }
