@@ -185,13 +185,13 @@ object InvokeScriptTransactionDiff {
               }
 
               scriptsComplexity = {
-                tx.checkedAssets()
-                  .collect { case asset @ IssuedAsset(_) => asset }
-                  .flatMap(blockchain.assetScript)
+                val assetsComplexity = (tx.checkedAssets().map(_.id) ++ ps.flatMap(_._3))
+                  .flatMap(id => blockchain.assetScript(IssuedAsset(id)))
                   .map(_.complexity)
-                  .sum +
-                  ps.flatMap(_._3.flatMap(id => blockchain.assetScript(IssuedAsset(id))).map(_.complexity)).sum +
-                  blockchain.accountScript(tx.sender).fold(0L)(_.complexity)
+                  .sum
+
+                val accountComplexity = blockchain.accountScript(tx.sender).fold(0L)(_.complexity)
+                assetsComplexity + accountComplexity
               }
 
               _ <- foldScriptTransfers(blockchain, tx, dAppAddress)(ps, dataAndPaymentDiff)
@@ -245,9 +245,9 @@ object InvokeScriptTransactionDiff {
       if (totalDataBytes <= ContractLimits.MaxWriteSetSizeInBytes) {
         Right(
           Diff(height = height,
-            tx = tx,
-            portfolios = feePart combine payablePart,
-            accountData = Map(dAppAddress -> AccountDataInfo(dataEntries.map(d => d.key -> d).toMap)))
+               tx = tx,
+               portfolios = feePart combine payablePart,
+               accountData = Map(dAppAddress -> AccountDataInfo(dataEntries.map(d => d.key -> d).toMap)))
         )
       } else
         Left(GenericError(s"WriteSet size can't exceed ${ContractLimits.MaxWriteSetSizeInBytes} bytes, actual: $totalDataBytes bytes"))

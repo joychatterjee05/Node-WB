@@ -19,12 +19,16 @@ object PaymentTransactionDiff {
       Left(GenericError(s"Payment transaction is deprecated after h=${settings.blockVersion3AfterHeight}"))
     } else {
       Right(
-        Diff(height = height, tx = tx, portfolios = Map(tx.recipient -> Portfolio(balance = tx.amount, LeaseBalance.empty, assets = Map.empty)) combine Map(
+        Diff(
+          height = height,
+          tx = tx,
+          portfolios = Map(tx.recipient -> Portfolio(balance = tx.amount, LeaseBalance.empty, assets = Map.empty)) combine Map(
             Address.fromPublicKey(tx.sender) -> Portfolio(
               balance = -tx.amount - tx.fee,
               LeaseBalance.empty,
               assets = Map.empty
-            ))))
+            ))
+        ))
     }
   }
 }

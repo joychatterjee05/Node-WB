@@ -45,7 +45,11 @@ object MassTransferTransactionDiff {
 
       Either.cond(
         assetIssued,
-        Diff(height, tx, completePortfolio, scriptsRun = DiffsCommon.countScriptRuns(blockchain, tx), scriptsComplexity = DiffsCommon.countScriptsComplexity(blockchain, tx)),
+        Diff(height,
+          tx,
+          completePortfolio,
+          scriptsRun = DiffsCommon.countScriptRuns(blockchain, tx),
+          scriptsComplexity = DiffsCommon.countScriptsComplexity(blockchain, tx)),
         GenericError(s"Attempt to transfer a nonexistent asset")
       )
     }
