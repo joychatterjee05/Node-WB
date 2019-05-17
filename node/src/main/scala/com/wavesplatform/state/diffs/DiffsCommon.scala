@@ -7,7 +7,7 @@ private[diffs] object DiffsCommon {
   def countScriptRuns(blockchain: Blockchain, tx: ProvenTransaction): Int =
     tx.checkedAssets().count(blockchain.hasAssetScript) + Some(tx.sender.toAddress).count(blockchain.hasScript)
 
-  def countScriptsComplexity(blockchain: Blockchain, tx: ProvenTransaction): Int = {
+  def countScriptsComplexity(blockchain: Blockchain, tx: ProvenTransaction): Long = {
     val assetsComplexity = tx
       .checkedAssets()
       .flatMap(blockchain.assetDescription)
@@ -19,7 +19,6 @@ private[diffs] object DiffsCommon {
       .accountScript(tx.sender.toAddress)
       .fold(0L)(_.complexity)
 
-    tx.checkedAssets().count(blockchain.hasAssetScript) + Some(tx.sender.toAddress).count(blockchain.hasScript)
+    assetsComplexity + accountComplexity
   }
-
 }

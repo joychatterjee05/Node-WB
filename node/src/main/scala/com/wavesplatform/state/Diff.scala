@@ -178,7 +178,7 @@ object Diff {
             sponsorship: Map[IssuedAsset, Sponsorship] = Map.empty,
             scriptsRun: Int = 0,
             scriptsComplexity: Long = 0,
-            scriptResults: Map[ByteStr, InvokeScriptResult] = Map.empty) =
+            scriptResults: Map[ByteStr, InvokeScriptResult] = Map.empty): Diff =
     Diff(
       transactions = Map((tx.id(), (height, tx, (portfolios.keys ++ accountData.keys).toSet))),
       portfolios = portfolios,
