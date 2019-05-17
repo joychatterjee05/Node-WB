@@ -128,7 +128,7 @@ object BlockDiffer extends ScorexLogging {
       constraint.put(blockchain, tx, diff).asInstanceOf[Constraint]
 
     val txDiffer       = TransactionDiffer(settings, prevBlockTimestamp, timestamp, currentBlockHeight, verify) _
-    val initDiff       = Diff.empty.copy(portfolios = Map(blockGenerator -> currentBlockFeeDistr.orElse(prevBlockFeeDistr).orEmpty), scriptsComplexity = scriptsComplexity)
+    val initDiff       = Diff.empty.copy(portfolios = Map(blockGenerator -> currentBlockFeeDistr.orElse(prevBlockFeeDistr).orEmpty))
     val hasNg          = currentBlockFeeDistr.isEmpty
     val hasSponsorship = currentBlockHeight >= Sponsorship.sponsoredFeesSwitchHeight(blockchain, settings)
 
@@ -169,7 +169,7 @@ object BlockDiffer extends ScorexLogging {
 
               Right(
                 if (hasNg) {
-                  val diff = updatedDiff.combine(Diff.empty.copy(portfolios = Map(blockGenerator -> curBlockFees), scriptsComplexity = scriptsComplexity))
+                  val diff = updatedDiff.combine(Diff.empty.copy(portfolios = Map(blockGenerator -> curBlockFees)))
                   Result(diff, carryFee + nextBlockFee, totalWavesFee, updatedConstraint)
                 } else {
                   Result(updatedDiff, 0L, totalWavesFee, updatedConstraint)
