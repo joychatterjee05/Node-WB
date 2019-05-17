@@ -13,11 +13,10 @@ import com.wavesplatform.settings.FunctionalitySettings
 import com.wavesplatform.state._
 import com.wavesplatform.state.patch.{CancelAllLeases, CancelInvalidLeaseIn, CancelLeaseOverflow}
 import com.wavesplatform.state.reader.CompositeBlockchain.composite
-import com.wavesplatform.transaction.smart.script.trace.TracedResult
-import com.wavesplatform.transaction.TxValidationError.ActivationError
 import com.wavesplatform.transaction.Transaction
+import com.wavesplatform.transaction.TxValidationError.{ActivationError, _}
+import com.wavesplatform.transaction.smart.script.trace.TracedResult
 import com.wavesplatform.utils.ScorexLogging
-import com.wavesplatform.transaction.TxValidationError._
 
 object BlockDiffer extends ScorexLogging {
   final case class Result[Constraint <: MiningConstraint](diff: Diff, carry: Long, totalFee: Long, constraint: Constraint)
@@ -129,7 +128,7 @@ object BlockDiffer extends ScorexLogging {
       constraint.put(blockchain, tx, diff).asInstanceOf[Constraint]
 
     val txDiffer       = TransactionDiffer(settings, prevBlockTimestamp, timestamp, currentBlockHeight, verify) _
-    val initDiff       = Diff.empty.copy(portfolios = Map(blockGenerator -> currentBlockFeeDistr.orElse(prevBlockFeeDistr).orEmpty))
+    val initDiff       = Diff.empty.copy(portfolios = Map(blockGenerator -> currentBlockFeeDistr.orElse(prevBlockFeeDistr).orEmpty), scriptsComplexity = scriptsComplexity)
     val hasNg          = currentBlockFeeDistr.isEmpty
     val hasSponsorship = currentBlockHeight >= Sponsorship.sponsoredFeesSwitchHeight(blockchain, settings)
 
@@ -170,7 +169,7 @@ object BlockDiffer extends ScorexLogging {
 
               Right(
                 if (hasNg) {
-                  val diff = updatedDiff.combine(Diff.empty.copy(portfolios = Map(blockGenerator -> curBlockFees)))
+                  val diff = updatedDiff.combine(Diff.empty.copy(portfolios = Map(blockGenerator -> curBlockFees), scriptsComplexity = scriptsComplexity))
                   Result(diff, carryFee + nextBlockFee, totalWavesFee, updatedConstraint)
                 } else {
                   Result(updatedDiff, 0L, totalWavesFee, updatedConstraint)

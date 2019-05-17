@@ -14,7 +14,8 @@ object DataTransactionDiff {
         tx,
         portfolios = Map(sender  -> Portfolio(-tx.fee, LeaseBalance.empty, Map.empty)),
         accountData = Map(sender -> AccountDataInfo(tx.data.map(item => item.key -> item).toMap)),
-        scriptsRun = (if(blockchain.hasScript(tx.sender)) { 1 } else { 0 })
+        scriptsRun = DiffsCommon.countScriptRuns(blockchain, tx),
+        scriptsComplexity = DiffsCommon.countScriptsComplexity(blockchain, tx)
       ))
   }
 }

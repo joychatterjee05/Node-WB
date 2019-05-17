@@ -87,7 +87,7 @@ object InvokeScriptTransactionDiff {
     }
 
     accScriptEi match {
-      case Right(Some(ContractScriptImpl(_, contract, _))) =>
+      case Right(Some(sc @ ContractScriptImpl(_, contract, _))) =>
         val functionName = tx.funcCallOpt.map(_.function.asInstanceOf[FunctionHeader.User].name).getOrElse(ContractEvaluator.DEFAULT_FUNC_NAME)
 
         val contractFunc =
@@ -183,6 +183,17 @@ object InvokeScriptTransactionDiff {
                     .fold("WAVES")(_.toString)} for ${tx.builder.classTag} with $totalScriptsInvoked total scripts invoked does not exceed minimal value of $minWaves WAVES: ${tx.assetFee._2}")
                 )
               }
+
+              scriptsComplexity = {
+                tx.checkedAssets()
+                  .collect { case asset @ IssuedAsset(_) => asset }
+                  .flatMap(blockchain.assetScript)
+                  .map(_.complexity)
+                  .sum +
+                  ps.flatMap(_._3.flatMap(id => blockchain.assetScript(IssuedAsset(id))).map(_.complexity)).sum +
+                  blockchain.accountScript(tx.sender).fold(0L)(_.complexity)
+              }
+
               _ <- foldScriptTransfers(blockchain, tx, dAppAddress)(ps, dataAndPaymentDiff)
             } yield {
               val paymentReceiversMap: Map[Address, Portfolio] = Monoid
@@ -191,8 +202,12 @@ object InvokeScriptTransactionDiff {
                 .mapValues(l => Monoid.combineAll(l))
               val paymentFromContractMap = Map(dAppAddress -> Monoid.combineAll(paymentReceiversMap.values).negate)
               val transfers              = Monoid.combineAll(Seq(paymentReceiversMap, paymentFromContractMap))
-              val isr = InvokeScriptResult(data = dataEntries, transfers = paymentReceiversMap.toVector.flatMap { case (addr, pf) => InvokeScriptResult.paymentsFromPortfolio(addr, pf) })
-              dataAndPaymentDiff.copy(scriptsRun = scriptsInvoked + 1) |+| Diff.stateOps(portfolios = transfers, scriptResults = Map(tx.id() -> isr))
+              val isr = InvokeScriptResult(data = dataEntries, transfers = paymentReceiversMap.toVector.flatMap {
+                case (addr, pf) => InvokeScriptResult.paymentsFromPortfolio(addr, pf)
+              })
+              dataAndPaymentDiff.copy(scriptsRun = scriptsInvoked + 1, scriptsComplexity = scriptsComplexity + sc.complexity) |+| Diff.stateOps(
+                portfolios = transfers,
+                scriptResults = Map(tx.id() -> isr))
             }
         }
       case Left(l) => TracedResult(Left(l))

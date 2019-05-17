@@ -30,7 +30,7 @@ object LeaseTransactionsDiff {
             recipient -> Portfolio(0, LeaseBalance(tx.amount, 0), Map.empty)
           )
           Right(Diff(height = height, tx = tx, portfolios = portfolioDiff, leaseState = Map(tx.id() -> true),
-            scriptsRun = (if(blockchain.hasScript(tx.sender)) { 1 } else { 0 })))
+            scriptsRun = DiffsCommon.countScriptRuns(blockchain, tx), scriptsComplexity = DiffsCommon.countScriptsComplexity(blockchain, tx)))
         }
       }
     }

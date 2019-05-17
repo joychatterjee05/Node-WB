@@ -24,6 +24,6 @@ object CancelLeaseOverflow extends ScorexLogging {
     leasesToCancel.foreach(id => log.info(s"Cancelling lease $id"))
     log.info("Finished cancelling all lease overflows for sender")
 
-    Diff.empty.copy(portfolios = addressesWithLeaseOverflow, leaseState = leasesToCancel.map(_ -> false).toMap)
+    Diff.empty.copy(portfolios = addressesWithLeaseOverflow, leaseState = leasesToCancel.map(_ -> false).toMap, scriptsComplexity = scriptsComplexity)
   }
 }

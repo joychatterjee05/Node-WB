@@ -27,6 +27,6 @@ object CancelInvalidLeaseIn extends ScorexLogging {
 
     log.info("Finished collecting lease in overflows")
 
-    Diff.empty.copy(portfolios = diff)
+    Diff.empty.copy(portfolios = diff, scriptsComplexity = scriptsComplexity)
   }
 }
